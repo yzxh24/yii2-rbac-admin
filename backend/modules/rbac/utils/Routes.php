@@ -26,6 +26,32 @@ class Routes
         $this->_routes = $this->getRoutes();
     }
 
+    public static function updateRouteLabel($route, $label)
+    {
+        // TODO 以下实现有点搓,想办法改改
+        $allRoutes = static::getAllModuleRoutes();
+        foreach ($allRoutes as $module => $routes)
+        {
+            if ($module == substr($route, 0, strlen($module)))
+            {
+                $controllers = $routes->getControllers();
+                foreach ($controllers as $controller) {
+                    $actions = $controller->getActions();
+                    foreach ($actions as $action) {
+                        if ($action->getRoute() == $route) {
+                            $_routes = $routes->toArray();
+                            $_routes['controllers'][$controller->getRouteName()]['actions'][$action->getActionRouteUrl()] = $label;
+                            $routes->save($_routes);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static function getAllModules()
     {
         $modules = [];
@@ -72,8 +98,7 @@ class Routes
     public function getControllers()
     {
         $controllers = [];
-        foreach ($this->_routes['controllers'] as $controllerName => $controller)
-        {
+        foreach ($this->_routes['controllers'] as $controllerName => $controller) {
             $structure = new OneControllerStructure();
             $structure->name = $controllerName;
             $structure->label = $controller['label'];
@@ -143,10 +168,10 @@ class Routes
      */
     public function generateRoutes($backUp = false)
     {
-        $routesFile = $this->getRoutesFile();
-        if (!is_file($routesFile)) {
-            file_put_contents($routesFile, "<?php\nreturn [\n\n];", LOCK_EX);
-        }
+//        $routesFile = $this->getRoutesFile();
+//        if (!is_file($routesFile)) {
+//            file_put_contents($routesFile, "<?php\nreturn [\n\n];", LOCK_EX);
+//        }
 
         if ($backUp) {
             $this->backUp();
@@ -154,10 +179,41 @@ class Routes
 
         $generator = new RoutesGenerator($this->_module);
         $routes = ArrayHelper::merge($generator->getRoutes(), $this->getRoutes());
+//        file_put_contents($routesFile, "<?php\nreturn " . VarDumper::export([$this->getModuleName() => $routes]) . ";\n", LOCK_EX);
+//        $this->_routes = $routes;
+//
+//        return $routes;
+        return $this->save($routes);
+    }
+
+    public function save($routes)
+    {
+        $routesFile = $this->getRoutesFile();
+        if (!is_file($routesFile)) {
+            file_put_contents($routesFile, "<?php\nreturn [\n\n];", LOCK_EX);
+        }
+
         file_put_contents($routesFile, "<?php\nreturn " . VarDumper::export([$this->getModuleName() => $routes]) . ";\n", LOCK_EX);
         $this->_routes = $routes;
 
         return $routes;
+    }
+
+    public function toArray()
+    {
+        $routes = [];
+        $controllers = $this->getControllers();
+        foreach ($controllers as $controller)
+        {
+            $controllerStructure = $controller->createRoutesStructure();
+            $key = array_keys($controllerStructure)[0];
+            $routes[$key] = $controllerStructure[$key];
+        }
+
+        return [
+            'label' => $this->_module,
+            'controllers' => $routes
+        ];
     }
 
     /**
@@ -203,7 +259,6 @@ class RoutesGenerator
             'label' => $this->_module,
             'controllers' => $routes
         ];
-
     }
 
     /**
@@ -308,6 +363,11 @@ class OneAction
         }
 
         return $this->_structure->label;
+    }
+
+    public function setLabel($label)
+    {
+        $this->_structure->label = $label;
     }
 }
 

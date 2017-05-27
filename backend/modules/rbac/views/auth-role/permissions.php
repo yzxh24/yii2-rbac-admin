@@ -32,6 +32,34 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             });
         });
+
+        $('.route-label').on('dblclick', function (e) {
+            var label = $(this).text();
+            var route = $(this).prev().val();
+
+            var html = '<input type="text" value="' + label + '" />';
+            $(this).html(html).find('input').focus().keyup(function (event) {
+                var new_label = $(this).val();
+                if (event.keyCode != 13) {
+                    return;
+                }
+
+                var self = $(this);
+                if (new_label == label) {
+                    self.parent().append(new_label);
+                    self.remove();
+                } else {
+                    $.post('<?= Url::toRoute('/rbac/auth-route/update-label')?>', {'route': route, 'label': new_label}, function (response) {
+                        if (1 == response.code) {
+                            self.parent().append(new_label);
+                            self.remove();
+                        } else {
+                            alert(response.msg);
+                        }
+                    });
+                }
+            });
+        });
     });
 </script>
 <?php JsBlock::end()?>
@@ -51,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="tab-content">
                 <?php echo Alert::widget(['options' => ['class' => 'alert-success']])?>
 
-                <?php $form = ActiveForm::begin(['options' => ['class' => 'form-horizontal']]); ?>
+                <?php $form = ActiveForm::begin(['options' => ['class' => 'form-horizontal', 'onkeydown' => 'if(event.keyCode==13){return false;}']]); ?>
                 <?php $index = 1;?>
                 <?php foreach ($routes as $key => $route):?>
                 <div class="tab-pane active" id="tab_<?= $index++?>">
@@ -72,7 +100,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?php foreach ($controller->getActions() as $action): ?>
                                         <div class="checkbox">
                                             <label class="action" data-toggle="tooltip" data-placement="right" title="<?= $action->getRoute()?>">
-                                                <input<?php if(in_array($action->getRoute(), $permissions)):?> checked<?php endif;?> type="checkbox" name="permissions[]" value="<?= $action->getRoute()?>" class="<?= $key?>-<?= $controller->getRouteName()?>"> <?= $action->getLabel()?>
+                                                <input<?php if(in_array($action->getRoute(), $permissions)):?> checked<?php endif;?> type="checkbox" name="permissions[]" value="<?= $action->getRoute()?>" class="<?= $key?>-<?= $controller->getRouteName()?>"> <div class="route-label"><?= $action->getLabel()?></div>
                                             </label>
                                         </div>
 

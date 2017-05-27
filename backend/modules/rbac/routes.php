@@ -1,7 +1,7 @@
 <?php
 return [
     'rbac' => [
-        'label' => '用户权限管理',
+        'label' => 'rbac',
         'controllers' => [
             'auth-menu' => [
                 'label' => '后台菜单管理',
@@ -23,6 +23,13 @@ return [
                     'create' => '添加角色',
                     'update' => '修改角色',
                     'delete' => '删除角色',
+                ],
+            ],
+            'auth-route' => [
+                'label' => '后台路由管理',
+                'controller' => 'AuthRouteController',
+                'actions' => [
+                    'update-label' => '修改路由显示名称',
                 ],
             ],
             'auth-user' => [
