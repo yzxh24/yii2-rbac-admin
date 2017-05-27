@@ -9,8 +9,8 @@
 namespace backend\modules\rbac\controllers;
 
 use Yii;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use backend\components\BackendController;
 use backend\models\AuthMenu;
 use backend\modules\rbac\utils\Helper;

@@ -82,9 +82,9 @@ class AuthRoleController extends BackendController
         $form = new RoleForm();
         $form->setScenario('create');
 
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+        if ($form->load(Yii::$app->request->post()) && $form->validate())
+        {
             $form->createRole();
-//            return $this->redirect(['index']);
             Yii::$app->session->setFlash("success", "角色添加成功,现在你可以为角色分配权限了");
             return $this->redirect(['permissions', 'id' => $form->name]);
         }

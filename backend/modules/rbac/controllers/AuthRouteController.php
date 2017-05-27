@@ -9,9 +9,9 @@
 namespace backend\modules\rbac\controllers;
 
 use Yii;
+use yii\web\Response;
 use backend\modules\rbac\utils\Routes;
 use backend\components\BackendController;
-use yii\web\Response;
 
 class AuthRouteController extends BackendController
 {

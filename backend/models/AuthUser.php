@@ -129,4 +129,34 @@ class AuthUser extends ActiveRecord
 
         return Html::tag("span", $view, ['class' => $colorClass]);
     }
+
+    /**
+     * 给用户设置角色
+     * @param array $roles
+     */
+    public function setRoles($roles)
+    {
+        $auth = Yii::$app->authManager;
+        $userRoles = $auth->getRolesByUser($this->id);
+
+        if (empty($roles))
+        {
+            foreach ($userRoles as $userRole) {
+                $auth->revoke($userRole, $this->id);
+            }
+        }
+        else
+        {
+            foreach ($userRoles as $userRole) {
+                $auth->revoke($userRole, $this->id);
+            }
+
+            foreach ($roles as $key) {
+                $role = $auth->getRole($key);
+                if (null !== $role) {
+                    $auth->assign($role, $this->id);
+                }
+            }
+        }
+    }
 }

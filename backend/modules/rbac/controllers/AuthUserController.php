@@ -2,7 +2,6 @@
 
 namespace backend\modules\rbac\controllers;
 
-use backend\modules\rbac\utils\Routes;
 use Yii;
 use yii\web\Response;
 use yii\web\NotFoundHttpException;
@@ -31,52 +30,37 @@ class AuthUserController extends BackendController
     }
 
     /**
-     * 给用户分配角色
+     * 返回用户分配角色操作界面
      * @param int $id
      * @return string
      */
     public function actionRole($id)
     {
-        $roles = Yii::$app->authManager->getRoles();
-        $userRoles = Yii::$app->authManager->getRolesByUser($id);
-
         return $this->renderAjax('role', [
             'id' => $id,
-            'roles' => $roles,
-            'userRoles' => $userRoles,
+            'roles' => Yii::$app->authManager->getRoles(),
+            'userRoles' => Yii::$app->authManager->getRolesByUser($id),
         ]);
     }
 
+    /**
+     * 给用户设置角色
+     * @return array
+     */
     public function actionSaveRole()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $auth = Yii::$app->authManager;
         $userId = Yii::$app->request->post('user_id');
         $roles = Yii::$app->request->post('roles');
-        $userRoles = $auth->getRolesByUser($userId);
 
-        if (empty($roles))
-        {
-            foreach ($userRoles as $userRole) {
-                $auth->revoke($userRole, $userId);
-            }
-        }
-        else
-        {
-            foreach ($userRoles as $userRole) {
-                $auth->revoke($userRole, $userId);
-            }
 
-            foreach ($roles as $key) {
-                $role = $auth->getRole($key);
-                if (null !== $role) {
-                    $auth->assign($role, $userId);
-                }
-            }
+        $user = AuthUser::findOne($userId);
+        if ($user) {
+            $user->setRoles($roles);
         }
 
-        return ['code' => 0];
+        return ['code' => 1];
     }
 
     /**
@@ -119,35 +103,6 @@ class AuthUserController extends BackendController
             'model' => $model,
         ]);
     }
-
-    /**
-     * Deletes an existing AuthUser model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     */
-//    public function actionDelete($id)
-//    {
-//        $this->findModel($id)->delete();
-//
-//        return $this->redirect(['index']);
-//    }
-
-    /**
-    * 批量删除
-    * @return void
-    */
-//    public function actionBatchDelete()
-//    {
-//        $idArray = Yii::$app->request->post('id');
-//        foreach ($idArray as $id)
-//        {
-//            $model = AuthUser::findOne($id);
-//            if (null != $model) {
-//                $model->delete();
-//            }
-//        }
-//    }
 
     /**
      * Finds the AuthUser model based on its primary key value.

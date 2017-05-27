@@ -1,7 +1,3 @@
-<?php
-use backend\modules\rbac\utils\MenuHelper;
-?>
-
 <aside class="main-sidebar">
 
     <section class="sidebar">
