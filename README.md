@@ -4,10 +4,18 @@ This program is based on [yii2-app-advanced](https://github.com/yiisoft/yii2-app
 You can use it as a background template to build your own website system
 
 # Installation
-Download all files to local, then go to application root path, run:
+Download all files to local, first, you must import docs/yii2_rbac_admin.sql to your Database, then go to application root path, run:
 
 ```
-composer install
+$ composer install
 ```
 
-install dependent packages
+install dependent packages, and run: 
+
+```
+$ ./init
+```
+
+select Development, then the local environments is dev.
+
+Ok, you can visits http://localhost/xxx/backend/web, default demo account username: admin, password: admin
