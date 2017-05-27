@@ -86,6 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'domain_account',
             [
                 'attribute' => 'status',
+                'filter' => \backend\models\AuthUser::$statusMap,
                 'content' => function($data, $row) {
                     return $data->getStatusColorView();
                 }
