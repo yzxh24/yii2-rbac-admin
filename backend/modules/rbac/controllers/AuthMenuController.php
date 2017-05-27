@@ -11,10 +11,9 @@ namespace backend\modules\rbac\controllers;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
-use backend\components\BackendController;
 use backend\models\AuthMenu;
-use backend\modules\rbac\utils\Helper;
 use backend\models\search\AuthMenuSearch;
+use backend\components\BackendController;
 
 class AuthMenuController extends BackendController
 {
@@ -58,7 +57,6 @@ class AuthMenuController extends BackendController
         $model = new AuthMenu();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Helper::invalidate();
             return $this->redirect(['index']);
         }
 
@@ -81,7 +79,6 @@ class AuthMenuController extends BackendController
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Helper::invalidate();
             return $this->redirect(['index']);
         }
 
@@ -99,7 +96,6 @@ class AuthMenuController extends BackendController
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-        Helper::invalidate();
 
         return $this->redirect(['index']);
     }
