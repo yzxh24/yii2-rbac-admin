@@ -1,14 +1,18 @@
 <?php
 use yii\helpers\Url;
 use dmstr\widgets\Alert;
+use backend\assets\GrowlAsset;
+
 use common\widgets\JsBlock;
 use backend\forms\ActiveForm;
+
+GrowlAsset::register($this);
 
 $this->title = "角色授权";
 $this->params['breadcrumbs'][] = ['label' => '角色列表', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-?>
 
+?>
 
 <style>
 .action {margin-left: 20px;}
@@ -28,7 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             $.get('<?= Url::toRoute('create-permissions') ?>', function (response) {
                 if (1 == response.code) {
-                    window.location.reload();
+                    growl.success("已生成,重新载入中...");
+                    setTimeout(function () {
+                        window.location.reload()
+                    }, 3000);
                 }
             });
         });
@@ -53,8 +60,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         if (1 == response.code) {
                             self.parent().append(new_label);
                             self.remove();
+                            growl.success("修改成功");
                         } else {
-                            alert(response.msg);
+                            growl.danger(response.msg);
                         }
                     });
                 }
@@ -118,10 +126,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="box-footer">
                 <div class="form-group">
-                    <label class="col-sm-2 control-label" for="text-type"></label>
-                    <div class="col-xs-6 help-block">
+                    <label class="col-xs-3 control-label" for="text-type"></label>
+                    <div class="col-xs-2">
+                        <div class="pull-right">
                         <button type="submit" class="btn btn-primary btn-flat">保存</button>
                         <a href="<?=Url::to(['index']) ?>"><button type="button" class="btn btn-default btn-flat">取消</button></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="help-block">双击权限名称进行修改,回车保存</span>
                     </div>
                 </div>
             </div>
