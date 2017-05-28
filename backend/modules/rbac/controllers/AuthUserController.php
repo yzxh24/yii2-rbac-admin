@@ -45,12 +45,10 @@ class AuthUserController extends BackendController
 
     /**
      * 给用户设置角色
-     * @return array
+     * @return Response
      */
     public function actionSaveRole()
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
         $userId = Yii::$app->request->post('user_id');
         $roles = Yii::$app->request->post('roles');
 
@@ -60,7 +58,7 @@ class AuthUserController extends BackendController
             $user->setRoles($roles);
         }
 
-        return ['code' => 1];
+        return $this->asJson(['code' => 1]);
     }
 
     /**

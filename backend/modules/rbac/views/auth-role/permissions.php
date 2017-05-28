@@ -21,8 +21,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php JsBlock::begin()?>
 <script>
     $(function () {
+        var TimeFn = null;
+
         $(".checkAll").on('click', function(){
-            $("input[class='" + $(this).data('controller') + "']").prop("checked", this.checked);
+            clearTimeout(TimeFn);
+            var controller = $(this).data('controller');
+            var isChecked = this.checked;
+            TimeFn = setTimeout(function () {
+                $("input[class='" + controller + "']").prop("checked", isChecked);
+            }, 300);
         });
 
         $('#create-permissions').on('click', function () {
@@ -56,7 +63,39 @@ $this->params['breadcrumbs'][] = $this->title;
                     self.parent().append(new_label);
                     self.remove();
                 } else {
-                    $.post('<?= Url::toRoute('/rbac/auth-route/update-label')?>', {'route': route, 'label': new_label}, function (response) {
+                    $.post('<?= Url::toRoute('/rbac/auth-route/update-route-label')?>', {'route': route, 'label': new_label}, function (response) {
+                        if (1 == response.code) {
+                            self.parent().append(new_label);
+                            self.remove();
+                            growl.success("修改成功");
+                        } else {
+                            growl.danger(response.msg);
+                        }
+                    });
+                }
+            });
+        });
+
+        $('.controller-label').on('dblclick', function (e) {
+            clearTimeout(TimeFn);
+
+            var label = $(this).text();
+            var controllerClass = $(this).data('controller');
+            var module = $(this).data('module');
+
+            var html = '<input type="text" value="' + label + '" />';
+            $(this).html(html).find('input').focus().keyup(function (event) {
+                var new_label = $(this).val();
+                if (event.keyCode != 13) {
+                    return;
+                }
+
+                var self = $(this);
+                if (new_label == label) {
+                    self.parent().append(new_label);
+                    self.remove();
+                } else {
+                    $.post('<?= Url::toRoute('/rbac/auth-route/update-controller-label')?>', {'module': module, 'controller': controllerClass, 'label': new_label}, function (response) {
                         if (1 == response.code) {
                             self.parent().append(new_label);
                             self.remove();
@@ -98,8 +137,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="box box-primary">
                                 <div class="box-header with-border">
                                     <h3 class="box-title checkbox" style="font-size: 20px;">
-                                        <label>
-                                            <input type="checkbox" class="checkAll" data-controller="<?= $key?>-<?= $controller->getRouteName()?>"> <?= $controller->getLabel()?> (<?= $controller->getController() ?>)
+                                        <label data-toggle="tooltip" data-placement="right" title="<?= $controller->getController()?>">
+                                            <input type="checkbox" class="checkAll" data-controller="<?= $key?>-<?= $controller->getRouteName()?>">
+                                            <div class="controller-label" data-controller="<?= $controller->getController()?>" data-module="<?= $moduleName?>"><?= $controller->getLabel()?></div>
                                         </label>
                                     </h3>
                                 </div>

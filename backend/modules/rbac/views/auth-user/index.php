@@ -2,9 +2,10 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\CheckboxColumn;
-use backend\widgets\GridView;
 use yii\bootstrap\Modal;
+use yii\grid\CheckboxColumn;
+use kartik\widgets\Select2;
+use backend\widgets\GridView;
 use common\widgets\JsBlock;
 
 /* @var $this yii\web\View */
@@ -42,7 +43,9 @@ $this->params['breadcrumbs'][] = $this->title;
 </script>
 
 <?php JsBlock::end()?>
-
+<style>
+.select2-container .select2-selection--single .select2-selection__rendered {margin-top: 0}
+</style>
 <section class="content">
 
     <div class="box">
@@ -86,7 +89,18 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'domain_account',
             [
                 'attribute' => 'status',
-                'filter' => \backend\models\AuthUser::$statusMap,
+                'filter' => Select2::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'status',
+                    'data' => \backend\models\AuthUser::$statusMap,
+                    'hideSearch' => true,
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'options' => [
+                        'placeholder' => '帐号状态',
+                    ]
+                ]),
                 'content' => function($data, $row) {
                     return $data->getStatusColorView();
                 }

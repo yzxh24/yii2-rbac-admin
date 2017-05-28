@@ -29,7 +29,8 @@ return [
                 'label' => '后台路由管理',
                 'controller' => 'AuthRouteController',
                 'actions' => [
-                    'update-label' => '修改路由显示名称',
+                    'update-route-label' => '修改路由显示名称',
+                    'update-controller-label' => '修改控制器显示名称',
                 ],
             ],
             'auth-user' => [

@@ -9,21 +9,38 @@
 namespace backend\modules\rbac\controllers;
 
 use Yii;
-use yii\web\Response;
+use sergeymakinen\facades\Request;
 use backend\modules\rbac\utils\Routes;
 use backend\components\BackendController;
 
 class AuthRouteController extends BackendController
 {
-    public function actionUpdateLabel()
+    /**
+     * 修改路由器显示名称
+     * @return \yii\web\Response
+     */
+    public function actionUpdateRouteLabel()
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        $route = Yii::$app->request->post('route');
-        $label = Yii::$app->request->post('label');
+        $route = Request::post('route');
+        $label = Request::post('label');
 
         Routes::updateRouteLabel($route, $label);
 
-        return ['code' => 1];
+        return $this->asJson(['code' => 1]);
+    }
+
+    /**
+     * 修改控制器显示名称
+     * @return \yii\web\Response
+     */
+    public function actionUpdateControllerLabel()
+    {
+        $module = Request::post("module");
+        $controller = Request::post("controller");
+        $label = Request::post('label');
+
+        Routes::updateControllerLabel($module, $controller, $label);
+
+        return $this->asJson(['code' => 1]);
     }
 }

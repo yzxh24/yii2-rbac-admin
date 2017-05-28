@@ -26,6 +26,26 @@ class Routes
         $this->_routes = $this->getRoutes();
     }
 
+    public static function updateControllerLabel($module, $controllerClass, $label)
+    {
+        $allRoutes = static::getAllModuleRoutes();
+        foreach ($allRoutes as $moduleName => $routes) {
+            if ($module == $moduleName) {
+                $controllers = $routes->getControllers();
+                foreach ($controllers as $controller) {
+                    if ($controller->getController() == $controllerClass) {
+                        $_routes = $routes->toArray();
+                        $_routes['controllers'][$controller->getRouteName()]['label'] = $label;
+                        $routes->save($_routes);
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static function updateRouteLabel($route, $label)
     {
         // TODO 以下实现有点搓,想办法改改
@@ -168,21 +188,13 @@ class Routes
      */
     public function generateRoutes($backUp = false)
     {
-//        $routesFile = $this->getRoutesFile();
-//        if (!is_file($routesFile)) {
-//            file_put_contents($routesFile, "<?php\nreturn [\n\n];", LOCK_EX);
-//        }
-
         if ($backUp) {
             $this->backUp();
         }
 
         $generator = new RoutesGenerator($this->_module);
         $routes = ArrayHelper::merge($generator->getRoutes(), $this->getRoutes());
-//        file_put_contents($routesFile, "<?php\nreturn " . VarDumper::export([$this->getModuleName() => $routes]) . ";\n", LOCK_EX);
-//        $this->_routes = $routes;
-//
-//        return $routes;
+
         return $this->save($routes);
     }
 
@@ -449,6 +461,11 @@ class OneController
         }
 
         return $this->getController();
+    }
+
+    public function setLabel($label)
+    {
+        $this->_structure->label = $label;
     }
 
     public function getRouteName()

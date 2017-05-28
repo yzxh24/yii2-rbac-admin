@@ -58,18 +58,16 @@ class AuthRoleController extends BackendController
 
     /**
      * 扫描所有模块,自动生成 routes.php 裡的数据结构
-     * @return array
+     * @return Response
      */
     public function actionCreatePermissions()
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
         $routes = Routes::getAllModuleRoutes();
         foreach ($routes as $route) {
             $route->generateRoutes();
         }
 
-        return ['code' => 1];
+        return $this->asJson(['code' => 1]);
     }
 
     /**
